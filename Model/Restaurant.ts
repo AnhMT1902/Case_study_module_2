@@ -4,7 +4,7 @@ import {Table} from "./Table";
 import {Warehouse} from "./Warehouse";
 import it from "node:test";
 
-let inp = require('readline-sync')
+let inp = require('readline-sync');
 
 export class Restaurant {
     private name: string;
@@ -94,7 +94,9 @@ export class Restaurant {
     }
 
     // quản lý nhân viên
-
+    add(service: Service) {
+        this.listService.push(service);
+    }
     addService() {
         let id: number = +inp.question("nhap id");
         let name: string = inp.question("nhap ten nhan vien");

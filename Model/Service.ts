@@ -19,9 +19,9 @@ export class Service {
         let index: number = +inp.question("lua chon cua ban: ")
         let amount: number = +inp.question("nhap so luong mon an: ");
         let temp: number = 0;
-        Warehouse.listFood[index -1].amount -= amount;
-        Table.listOderFood.forEach((item)=>{
-            if (item.name == Warehouse.listFood[index -1].name) {
+        Warehouse.listFood[index - 1].amount -= amount;
+        Table.listOderFood.forEach((item) => {
+            if (item.name == Warehouse.listFood[index - 1].name) {
                 temp++;
                 item.amount += amount;
             }
@@ -34,7 +34,7 @@ export class Service {
     }
 
     ShowFoodOder() {
-        Table.listOderFood.forEach((item,index)=>{
+        Table.listOderFood.forEach((item, index) => {
             console.log(`${index}. ten mon: ${item.name}, gia: ${item.price}, so luong: ${item.amount}`)
         })
     }
@@ -44,15 +44,25 @@ export class Service {
         let index: number = inp.question("lua chon cua ban: ");
         let amount: number = inp.question("nhap lai so luong");
         Table.listOderFood[index - 1].amount = amount;
-        console.log("-----sua thanh cong-----")
+        Warehouse.listFood.forEach((item) => {
+            if (item == Table.listOderFood[index - 1]) {
+                item.amount -= amount + Table.listOderFood[index - 1].amount;
+            }
+        })
+        console.log("-----sua thanh cong-----");
+    }
+
+    static choiceMenuTable() {
+        console.log("1. Thêm món\n2. Sửa món\n3. Danh sách đã oder\n4. Thanh toán\n0. Quản lý bàn");
+        let index = inp.question("")
     }
 
     removeFoodOder() {
         let delName: string = inp.question("nhap ten mon an ban muon xoa");
         let temp: number = 0;
-        Table.listOderFood.forEach((item, index)=> {
+        Table.listOderFood.forEach((item, index) => {
             if (item.name.toUpperCase() == delName.toUpperCase()) {
-                Warehouse.listFood.forEach((element)=>{
+                Warehouse.listFood.forEach((element) => {
                     if (element.name == delName) {
                         element.amount += item.amount;
                     }

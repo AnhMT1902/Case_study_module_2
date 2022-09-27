@@ -1,12 +1,24 @@
 "use strict";
 exports.__esModule = true;
 exports.ManageRestaurant = void 0;
+var StaffOder_1 = require("../Model/StaffOder");
+var Food_1 = require("../Model/Food");
+var Table_1 = require("../Model/Table");
 var inp = require('readline-sync');
 var ManageRestaurant = /** @class */ (function () {
     function ManageRestaurant() {
         this.listStaff = [];
         this.listTable = [];
         this.menuFood = [];
+        this.addStaff(new StaffOder_1.StaffOder(1, "1", 1));
+        this.addFood(new Food_1.Food("pho", 35000, 50, null, null));
+        this.addFood(new Food_1.Food("lau", 35000, 50, null, null));
+        this.addFood(new Food_1.Food("bia", 35000, 50, null, null));
+        this.addTable(new Table_1.Table(1));
+        this.addTable(new Table_1.Table(2));
+        this.addTable(new Table_1.Table(3));
+        this.addTable(new Table_1.Table(4));
+        this.addTable(new Table_1.Table(5));
     }
     ManageRestaurant.prototype.addStaff = function (staff) {
         this.listStaff.push(staff);

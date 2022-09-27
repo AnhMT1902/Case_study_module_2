@@ -1,15 +1,18 @@
-//khai bao bien
 import {Restaurant} from "../Model/Restaurant";
 import {ManageRestaurant} from "../Manage/ManageRestaurant";
 import {StaffOder} from "../Model/StaffOder";
 import {Food} from "../Model/Food";
 import {Table} from "../Model/Table";
-
+import {Revenue} from "../Model/Revenue";
+import {ManageRevenue} from "../Manage/ManageRevenue";
+//khai bao bien
 let inp = require('readline-sync');
 let choice: string = "";
 let admin = new Restaurant();
 let staff: StaffOder;
 let restaurant = new ManageRestaurant()
+let useName;
+let address;
 
 //bat dau
 function main() {
@@ -32,7 +35,7 @@ function main() {
 
 main();
 
-//dao dien admin
+//dao dien login admin
 function loginAdmin() {
     while (choice != "0") {
         console.log("\x1b[36m" +
@@ -42,18 +45,27 @@ function loginAdmin() {
         choice = inp.question("");
         switch (choice) {
             case "1":
-                let useName = inp.question("ten dang nhap: ");
-                let address = inp.question("mat khau: ");
+                useName = inp.question("ten dang nhap: ");
+                address = inp.question("mat khau: ");
                 if (admin.name == useName && admin.address == address) {
                     console.log(`\x1b[34mDang nhap thanh cong!!!!\x1b[0m`)
                     menuManageRestaurant();
                 } else console.log(`\x1b[34msai thong tin dang nhap, vui long thu lai!!!!\x1b[0m`)
                 break;
             case "2":
+                console.log(`\x1b[34mten dang nhap va mat khau khong duoc de trong!!!!\x1b[0m`)
                 useName = inp.question("ten dang nhap: ");
                 address = inp.question("mat khau: ");
-                admin = new Restaurant(useName, address);
-                console.log(`\x1b[34mdang ky thanh cong!!!!\x1b[0m`)
+                if (useName.length > 0 && address.length > 0) {
+                    admin = new Restaurant(useName, address);
+                    console.log(`\x1b[34mdang ky thanh cong!!!!\x1b[0m`)
+                } else {
+                    console.log(`\x1b[34mten dang nhap hoac mat khau khong dung dinh dang\x1b[0m`);
+                    console.log(`\x1b[34mDang ky that bai!!!!\x1b[0m`)
+                }
+                break;
+            case "0":
+                main();
                 break;
         }
     }
@@ -81,10 +93,15 @@ function menuManageRestaurant() {
                 manageTable();
                 break;
             case "4":
-                showRestaurantRevenue();
+                showRestaurantRevenueOnDay();
+                break;
             // viet tiep o day
+            case "0":
+                main();
+                break;
+
         }
-    } while (choice != "0")
+    } while (choice != "0");
 }
 
 // quan ly nhan vien
@@ -337,10 +354,8 @@ function removeTableByName() {
     }
 }
 
-function loginStaffOder() {
-}
-
-function showRestaurantRevenue() {
+//doanh so ban hang
+function showRestaurantRevenueOnDay() {
     do {
         console.log("\x1b[36m----------DOANH SO NHA HANG----------\n" +
             "1. Ngay hom nay\n" +
@@ -360,4 +375,193 @@ function showRestaurantRevenue() {
                 break;
         }
     } while (choice != "0")
+}
+
+// dao dien logIn Staff
+function loginStaffOder() {
+    let id = +inp.question("vui long nhap id: ");
+    let useName = inp.question("nhap ten dang nhap: ");
+    let index = restaurant.findStaffByID(id);
+    if (index == -1) {
+        console.log(`\x1b[34msai thong tin dang nhap, vui long lien he nha hang de duoc cap lai!!!!\x1b[0m`)
+    } else if (restaurant.listStaff[index].useName == useName) {
+        //dang nhap thanh cong
+        staff = restaurant.listStaff[index];
+        manageOder();
+    } else {
+        console.log(`\x1b[34msai thong tin dang nhap, vui long lien he nha hang de duoc cap lai!!!!\x1b[0m`)
+    }
+}
+
+//menu StaffOder
+function manageOder() {
+    do {
+        console.log("\x1b[36m----------CHAO MUNG BAN DEN VOI BINH NGUYEN VO TAN----------\n" +
+            "1. Danh sach ban\n" +
+            "2. Danh sach ban con trong\n" +
+            "3. Thong tin tai khoan\n" +
+            "0. Dang xuat khoi trai dat\x1b[0m")
+        choice = inp.question("");
+        switch (choice) {
+            case "1":
+                showTableAndChoice();
+                break;
+            //viet tiep o day
+            case "2":
+                sh
+                break;
+            case "0":
+                main();
+                break;
+        }
+
+    } while (choice != "0")
+}
+
+// hien thi danh sach ban => chon
+function showTableAndChoice() {
+    do {
+        console.log(`\x1b[36m----------DANH SACH BAN----------\x1b[0m`)
+        showTable();
+        console.log(`\x1b[34m0. Quay lai\x1b[0m`);
+        choice = inp.question("");
+        if (choice != "0") {
+            if (+choice > restaurant.listTable.length) {
+                console.log(`\x1b[34mso so ban khong dung, vui long thu lai!!!!\x1b[0m`)
+            } else oderFoodInTable(choice);
+        } else manageOder();
+    } while (choice != "0")
+}
+
+//oder do an trong ban
+
+function oderFoodInTable(choice) {
+    let table = restaurant.listTable[+choice - 1];
+    do {
+        showMenuTable(table);
+    } while (choice != "0")
+}
+
+//menu ban
+function showMenuTable(table: Table) {
+    console.log("\x1b[36m----------ban so " + table.nameTable + "----------\n" +
+        "1. Oder\n" +
+        "2. Thong tin ban " + table.nameTable + "\n" +
+        "3. Thanh toan\n" +
+        "0. Quay lai\x1b[0m"
+    )
+    choice = inp.question("");
+    switch (choice) {
+        case "1":
+            oderFood(table);
+            break;
+        case "2":
+            showInForTable(table);
+            break;
+        case "3":
+            payCash(table);
+            break;
+        case "0":
+            showTableAndChoice();
+            break;
+    }
+}
+
+//oder do an
+function oderFood(table: Table) {
+    do {
+        console.log(`\x1b[34m-----------DANH SACH MON AN----------\x1b[0m`)
+        showFood();
+        console.log(`\x1b[34m0. Quay lai\x1b[0m`);
+        choice = inp.question("");
+        let food: Food = restaurant.menuFood[+choice - 1];
+        if (choice != "0") {
+            if (+choice > restaurant.menuFood.length) {
+                console.log(`\x1b[34msai so thu tu, vui long nhap lai!!!!\x1b[0m`)
+            } else {
+                let amount = +inp.question("so luong: ");
+                if (amount > food.amount) {
+                    console.log(`\x1b[34mqua so luong, vui long nhap lai!!!!\x1b[0m`)
+                } else if (amount > 0) {
+                    food.amount -= amount;
+                    let index = table.findFoodByName(food.name);
+                    if (index == -1) {
+                        table.oderFoodInTable(new Food(food.name, food.price, amount, staff, table));
+                    } else table.listOderFood[index].amount += amount;
+                    table.status = true;
+                    console.log(`\x1b[34mthem thanh cong!!!!\x1b[0m`);
+                } else {
+                    console.log(`\x1b[34mvui long nhap lai so luong!!!!\x1b[0m`)
+                }
+            }
+        } else showMenuTable(table);
+    } while (choice != "0")
+}
+
+//hien thi thong tin ban
+function showInForTable(table: Table) {
+    do {
+        console.log(`\x1b[34m----------thong tin ban ${table.nameTable}----------\x1b[0m`)
+        console.log(table.showListOderFood());
+        console.log("\x1b[36m1.Sua so luong mon\n" +
+            "2. Huy mon\n" +
+            "0. Quay lai\x1b[0m")
+        choice = inp.question("");
+        switch (choice) {
+            case "1":
+                updateAmountFood(table);
+                break;
+            case "2":
+                cancelFood(table);
+                break;
+            case "0":
+                showMenuTable(table);
+                break;
+        }
+    } while (choice != "0")
+}
+
+//huy mon
+function cancelFood(table: Table) {
+    let name: string = inp.question("nhap ten mon can huy: ")
+    let index = table.findFoodByName(name);
+    if (index == -1) {
+        console.log(`\x1b[34mmon nay cua duoc oder!!!!\x1b[0m`)
+    } else {
+        restaurant.menuFood[restaurant.findFoodByName(name)].amount += table.listOderFood[index].amount;
+        table.listOderFood.splice(index, 1);
+        console.log(`\x1b[34mhuy thanh cong!!!!\x1b[0m`);
+    }
+}
+
+// thay doi so luong
+function updateAmountFood(table) {
+    let name: string = inp.question("nhap ten mon can sua: ")
+    let index = table.findFoodByName(name);
+    if (index == -1) {
+        console.log(`\x1b[34mmon nay chua duoc oder!!!!\x1b[0m`)
+    } else {
+        let amount = +inp.question("vui long nhap lai so luong: ")
+        restaurant.menuFood[restaurant.findFoodByName(name)].amount += table.listOderFood[index].amount - amount;
+        table.listOderFood[index].amount = amount;
+        console.log(`\x1b[34mda sua thanh cong!!!!\x1b[0m`);
+    }
+}
+
+//thanh toan
+function payCash(table: Table) {
+    console.log(`\x1b[34m----------Thong tin hoa don----------\x1b[0m`)
+    console.log(table.showListOderFood());
+    console.log("\x1b[34m ban co chac chan muon thanh toan?\n" +
+        "1. Dong y\n" +
+        "0. Quay lai\x1b[0m");
+    choice = inp.question("");
+    if (choice == "1") {
+        let listOder = table.listOderFood;
+        let receipt = new Revenue(listOder, table.pay());
+        table.listOderFood = [];
+        ManageRevenue.historyRevenue.push(receipt);
+        table.status = false;
+        console.log(`\x1b[34m----------THANH TOAN THANH CONG----------\x1b[0m`)
+    }
 }

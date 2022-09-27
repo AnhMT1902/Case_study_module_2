@@ -10,6 +10,18 @@ export class ManageRestaurant {
     listTable: Table[] = [];
     menuFood: Food[] = [];
 
+    constructor() {
+        this.addStaff(new StaffOder(1,"1", 1));
+        this.addFood(new Food("pho", 35000, 50,null, null))
+        this.addFood(new Food("lau", 35000, 50,null, null))
+        this.addFood(new Food("bia", 35000, 50,null, null))
+        this.addTable(new Table(1))
+        this.addTable(new Table(2))
+        this.addTable(new Table(3))
+        this.addTable(new Table(4))
+        this.addTable(new Table(5))
+    }
+
     addStaff(staff: StaffOder) {
         this.listStaff.push(staff);
     }

@@ -1,12 +1,19 @@
+import {StaffOder} from "./StaffOder";
+import {Table} from "./Table";
+
 export class Food {
     private _name: string;
     private _price: number;
     private _amount: number;
+    service: StaffOder| null;
+    table: Table | null;
 
-    constructor(name: string, price: number, amount: number) {
+    constructor(name: string, price: number, amount: number, service: StaffOder | null, table: Table | null) {
         this._name = name;
         this._price = price;
         this._amount = amount;
+        this.service = service;
+        this.table = table;
     }
 
     get name(): string {

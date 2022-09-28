@@ -21,7 +21,8 @@ var Table = /** @class */ (function () {
     };
     Table.prototype.showListOderFood = function () {
         if (this.status == false) {
-            return "ban chua co khach";
+            console.log("ban chua co khach!!!!!");
+            return false;
         }
         else {
             var showFood_1 = "";
@@ -30,7 +31,11 @@ var Table = /** @class */ (function () {
                 showFood_1 += "".concat(index + 1, " ten mon: ").concat(item.name, ", so luong: ").concat(item.amount, ", gia: ").concat(item.price, ", nguoi oder: ").concat(item.service.useName, "\n");
                 sumPrice_1 += item.amount * item.price;
             });
-            return showFood_1 + "tam tinh: " + sumPrice_1;
+            console.log(showFood_1 + "tam tinh: " + sumPrice_1);
+            console.log("\x1b[36m1.Sua so luong mon\n" +
+                "2. Huy mon" +
+                "\x1b[0m");
+            return true;
         }
     };
     Table.prototype.updateFoodInTable = function (name) {

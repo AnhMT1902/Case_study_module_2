@@ -27,7 +27,8 @@ export class Table {
 
     showListOderFood() {
         if (this.status == false) {
-            return "ban chua co khach"
+            console.log("ban chua co khach!!!!!")
+            return false
         } else {
             let showFood: string = ""
             let sumPrice: number = 0;
@@ -35,7 +36,11 @@ export class Table {
                 showFood += `${index + 1} ten mon: ${item.name}, so luong: ${item.amount}, gia: ${item.price}, nguoi oder: ${item.service.useName}\n`
                 sumPrice += item.amount * item.price
             })
-            return showFood + "tam tinh: " + sumPrice;
+            console.log(showFood + "tam tinh: " + sumPrice);
+            console.log("\x1b[36m1.Sua so luong mon\n" +
+                "2. Huy mon" +
+                "\x1b[0m");
+            return true;
         }
     }
 

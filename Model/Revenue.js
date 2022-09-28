@@ -3,24 +3,30 @@ exports.__esModule = true;
 exports.Revenue = void 0;
 var upID = 1;
 var Revenue = /** @class */ (function () {
-    function Revenue(listOderFood, totalPayment) {
-        this.id = 0;
+    function Revenue(listOderFood, totalPayment, day, month, year, hours, minutes) {
+        if (day === void 0) { day = new Date().getDay(); }
+        if (month === void 0) { month = new Date().getMonth(); }
+        if (year === void 0) { year = new Date().getFullYear(); }
+        if (hours === void 0) { hours = new Date().getHours(); }
+        if (minutes === void 0) { minutes = new Date().getMinutes(); }
         this.listOderFood = [];
         this.id = upID++;
-        this.date = this.getDate();
+        this.day = day;
+        this.month = month;
+        this.year = year;
+        this.hours = hours;
+        this.minutes = minutes;
         this.listOderFood = listOderFood;
         this.totalPayment = totalPayment;
     }
-    Revenue.prototype.getDate = function () {
+    Revenue.prototype.getTime = function () {
         var today = new Date();
         var date = today.getDate() + '-' + (today.getMonth() + 1) + '-' + today.getFullYear();
         var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
         return date + ' ' + time;
     };
-    Revenue.prototype.printReceipt = function () {
-    };
     return Revenue;
 }());
 exports.Revenue = Revenue;
-var r1 = new Revenue([], 1);
-console.log(r1);
+// let r1 = new Revenue([], 1);
+// console.log(r1)

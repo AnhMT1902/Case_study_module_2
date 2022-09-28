@@ -13,9 +13,13 @@ var choice = "";
 var admin = new Restaurant_1.Restaurant();
 var staff;
 var restaurant = new ManageRestaurant_1.ManageRestaurant();
+var nameTable;
 var useName;
 var address;
+var table;
+var manageRevenue = new ManageRevenue_1.ManageRevenue();
 //bat dau
+console.log(manageRevenue);
 function main() {
     do {
         console.log("\x1b[36m----------LOG IN----------\n" +
@@ -80,7 +84,6 @@ function menuManageRestaurant() {
             "2. Menu mon an\n" +
             "3. Quan ly ban\n" +
             "4. Doanh thu cua hang\n" +
-            "5. Tinh luong nhan vien\n" +
             "0. Dang xuat\x1b[0m");
         choice = inp.question("");
         switch (choice) {
@@ -96,7 +99,6 @@ function menuManageRestaurant() {
             case "4":
                 showRestaurantRevenueOnDay();
                 break;
-            // viet tiep o day
             case "0":
                 main();
                 break;
@@ -325,9 +327,13 @@ function showTable() {
 }
 function showTableIsEmpty() {
     var res = restaurant.listTable.filter(function (item) { return (item.status == false); });
-    res.forEach(function (item, index) {
-        console.log("\u001B[34m".concat(index + 1, ". Ban ").concat(item.nameTable, ", trang thai: ").concat(item.status, "\u001B[0m"));
-    });
+    if (res.length == 0)
+        console.log("\u001B[34mHien tai khong con ban trong!!!!\u001B[0m");
+    else {
+        res.forEach(function (item, index) {
+            console.log("\u001B[34m".concat(index + 1, ". Ban ").concat(item.nameTable, ", trang thai: ").concat(item.status, "\u001B[0m"));
+        });
+    }
 }
 function removeTableByName() {
     var name = +inp.question("vui long nhap ten ban: ");
@@ -362,10 +368,13 @@ function showRestaurantRevenueOnDay() {
         choice = inp.question("");
         switch (choice) {
             case "1":
+                manageRevenue.todayRevenue();
                 break;
             case "2":
+                manageRevenue.tenDayRevenue();
                 break;
             case "3":
+                manageRevenue.monthRevenue();
                 break;
             case "0":
                 menuManageRestaurant();
@@ -396,12 +405,20 @@ function manageOder() {
         console.log("\x1b[36m----------CHAO MUNG BAN DEN VOI BINH NGUYEN VO TAN----------\n" +
             "1. Danh sach ban\n" +
             "2. Danh sach ban con trong\n" +
-            "3. Thong tin tai khoan\n" +
+            "3. Chon ban\n" +
             "0. Dang xuat khoi trai dat\x1b[0m");
         choice = inp.question("");
         switch (choice) {
             case "1":
-                showTableAndChoice();
+                console.log("\u001B[36m----------DANH SACH BAN----------\u001B[0m");
+                showTable();
+                break;
+            case "2":
+                console.log("\u001B[36m----------DANH SACH BAN CON TRONG----------\u001B[0m");
+                showTableIsEmpty();
+                break;
+            case "3":
+                choiceByNameTable();
                 break;
             case "0":
                 main();
@@ -410,26 +427,19 @@ function manageOder() {
     } while (choice != "0");
 }
 // hien thi danh sach ban => chon
-function showTableAndChoice() {
-    do {
-        console.log("\u001B[36m----------DANH SACH BAN----------\u001B[0m");
-        showTable();
-        console.log("\u001B[34m0. Quay lai\u001B[0m");
-        choice = inp.question("");
-        if (choice != "0") {
-            if (+choice > restaurant.listTable.length) {
-                console.log("\u001B[34mso so ban khong dung, vui long thu lai!!!!\u001B[0m");
-            }
-            else
-                oderFoodInTable(choice);
-        }
-        else
-            manageOder();
-    } while (choice != "0");
+function choiceByNameTable() {
+    nameTable = +inp.question("so ban: ");
+    var index = restaurant.findTableByID(nameTable);
+    if (index == -1) {
+        console.log("\u001B[34msai so ban, vui long nhap lai!!!!\u001B[0m");
+    }
+    else {
+        table = restaurant.listTable[index];
+        oderFoodInTable(table);
+    }
 }
 //oder do an trong ban
-function oderFoodInTable(choice) {
-    var table = restaurant.listTable[+choice - 1];
+function oderFoodInTable(table) {
     do {
         showMenuTable(table);
     } while (choice != "0");
@@ -453,66 +463,67 @@ function showMenuTable(table) {
             payCash(table);
             break;
         case "0":
-            showTableAndChoice();
+            manageOder();
             break;
     }
 }
 //oder do an
 function oderFood(table) {
-    do {
-        console.log("\u001B[34m-----------DANH SACH MON AN----------\u001B[0m");
-        showFood();
-        console.log("\u001B[34m0. Quay lai\u001B[0m");
-        choice = inp.question("");
-        var food = restaurant.menuFood[+choice - 1];
-        if (choice != "0") {
-            if (+choice > restaurant.menuFood.length) {
-                console.log("\u001B[34msai so thu tu, vui long nhap lai!!!!\u001B[0m");
+    console.log("\u001B[34m-----------DANH SACH MON AN----------\u001B[0m");
+    showFood();
+    console.log("\u001B[34m0. Quay lai\u001B[0m");
+    choice = inp.question("");
+    var food = restaurant.menuFood[+choice - 1];
+    if (choice != "0") {
+        if (+choice > restaurant.menuFood.length) {
+            console.log("\u001B[34msai so thu tu, vui long nhap lai!!!!\u001B[0m");
+        }
+        else {
+            var amount = +inp.question("so luong: ");
+            if (amount > food.amount) {
+                console.log("\u001B[34mqua so luong, vui long nhap lai!!!!\u001B[0m");
+            }
+            else if (amount > 0) {
+                food.amount -= amount;
+                var index = table.findFoodByName(food.name);
+                if (index == -1) {
+                    table.oderFoodInTable(new Food_1.Food(food.name, food.price, amount, staff, table));
+                }
+                else
+                    table.listOderFood[index].amount += amount;
+                table.status = true;
+                console.log("\u001B[34mthem thanh cong!!!!\u001B[0m");
+                showMenuTable(table);
             }
             else {
-                var amount = +inp.question("so luong: ");
-                if (amount > food.amount) {
-                    console.log("\u001B[34mqua so luong, vui long nhap lai!!!!\u001B[0m");
-                }
-                else if (amount > 0) {
-                    food.amount -= amount;
-                    var index = table.findFoodByName(food.name);
-                    if (index == -1) {
-                        table.oderFoodInTable(new Food_1.Food(food.name, food.price, amount, staff, table));
-                    }
-                    else
-                        table.listOderFood[index].amount += amount;
-                    table.status = true;
-                    console.log("\u001B[34mthem thanh cong!!!!\u001B[0m");
-                }
-                else {
-                    console.log("\u001B[34mvui long nhap lai so luong!!!!\u001B[0m");
-                }
+                console.log("\u001B[34mvui long nhap lai so luong!!!!\u001B[0m");
             }
         }
-        else
-            showMenuTable(table);
-    } while (choice != "0");
+    }
+    else
+        showMenuTable(table);
 }
 //hien thi thong tin ban
 function showInForTable(table) {
     do {
         console.log("\u001B[34m----------thong tin ban ".concat(table.nameTable, "----------\u001B[0m"));
-        console.log(table.showListOderFood());
-        console.log("\x1b[36m1.Sua so luong mon\n" +
-            "2. Huy mon\n" +
-            "0. Quay lai\x1b[0m");
-        choice = inp.question("");
-        switch (choice) {
-            case "1":
-                updateAmountFood(table);
-                break;
-            case "2":
-                cancelFood(table);
-                break;
-            case "0":
-                showMenuTable(table);
-                break;
+        if (table.showListOderFood() == false) {
+            break;
+        }
+        else {
+            console.log("\u001B[36m0. Quay lai\u001B[0m");
+            choice = inp.question("");
+            switch (choice) {
+                case "1":
+                    updateAmountFood(table);
+                    break;
+                case "2":
+                    cancelFood(table);
+                    break;
+                case "0":
+                    showMenuTable(table);
+                    break;
+            }
         }
     } while (choice != "0");
 }
@@ -545,18 +556,41 @@ function updateAmountFood(table) {
 }
 //thanh toan
 function payCash(table) {
-    console.log("\u001B[34m----------Thong tin hoa don----------\u001B[0m");
-    console.log(table.showListOderFood());
+    var listOder = table.listOderFood;
+    var revenue = new Revenue_1.Revenue(listOder, table.pay());
+    showRevenue(revenue);
     console.log("\x1b[34m ban co chac chan muon thanh toan?\n" +
-        "1. Dong y\x1b[0m");
+        "1. Dong y\n" +
+        "0. Quay lai\x1b[0m");
     choice = inp.question("");
     if (choice == "1") {
-        var listOder = table.listOderFood;
-        var receipt = new Revenue_1.Revenue(listOder, table.pay());
+        manageRevenue.historyRevenue.push(revenue);
+        console.log(manageRevenue.historyRevenue);
         table.listOderFood = [];
-        ManageRevenue_1.ManageRevenue.historyRevenue.push(receipt);
-        console.log(ManageRevenue_1.ManageRevenue.historyRevenue[0]);
         table.status = false;
         console.log("\u001B[34m----------THANH TOAN THANH CONG----------\u001B[0m");
+        manageOder();
     }
 }
+function showRevenue(revenue) {
+    console.log("" +
+        "\x1b[34m" +
+        "---------------------PHO MAI---------------------\n" +
+        "_________________________________________________\n" +
+        "                PHIEU THANH TOAN\n" +
+        "thoi gian: " + "".concat(revenue.day, "/").concat(revenue.month, "/").concat(revenue.year, " ").concat(revenue.hours, ":").concat(revenue.minutes) + "\n" +
+        "_________________________________________________\n" +
+        showListFood(revenue) + "\n" +
+        "_________________________________________________\n" +
+        "                    Thank you!       \x1b[0m");
+}
+function showListFood(revenue) {
+    var food = "";
+    var sumPrime = 0;
+    revenue.listOderFood.forEach(function (item) {
+        food += "ten mon: ".concat(item.name, ", sl: ").concat(item.amount, ", don gia: ").concat(item.price, ", T.Tien: ").concat(item.amount * item.price, "\n");
+        sumPrime += item.amount * item.price;
+    });
+    return food + "\nTong cong:" + sumPrime;
+}
+// doanh số nhà hàng
